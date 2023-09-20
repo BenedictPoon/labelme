@@ -34,6 +34,7 @@ from labelme.widgets import LabelListWidgetItem
 from labelme.widgets import ToolBar
 from labelme.widgets import UniqueLabelQListWidget
 from labelme.widgets import ZoomWidget
+from labelme.widgets import breeze_resources
 
 # FIXME
 # - [medium] Set max zoom value to something big enough for FitWidth/Window
@@ -318,7 +319,20 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tr('Toggle "keep pevious annotation" mode'),
             checkable=True,
         )
+        self._config["keep_prev"] = self._config["keep_prev"]
+        print(self._config["keep_prev"])
         toggle_keep_prev_mode.setChecked(self._config["keep_prev"])
+
+        toggleDarkMode = action(
+            self.tr("Dark Mode"),
+            self.toggleDarkMode,
+            None,
+            checkable=True,
+        )
+        toggleDarkMode.setChecked(self._config["dark_mode"])
+        if toggleDarkMode.isChecked():
+            self._config["dark_mode"] = not self._config["dark_mode"]
+            self.toggleDarkMode()
 
         createMode = action(
             self.tr("Create Polygons"),
@@ -605,6 +619,7 @@ class MainWindow(QtWidgets.QMainWindow):
             close=close,
             deleteFile=deleteFile,
             toggleKeepPrevMode=toggle_keep_prev_mode,
+            toggleDarkMode=toggleDarkMode,
             delete=delete,
             edit=edit,
             duplicate=duplicate,
@@ -734,6 +749,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 fitWidth,
                 None,
                 brightnessContrast,
+                toggleDarkMode,
+
             ),
         )
 
@@ -2154,3 +2171,17 @@ class MainWindow(QtWidgets.QMainWindow):
                     images.append(relativePath)
         images = natsort.os_sorted(images)
         return images
+
+    def toggleDarkMode(self):
+        dark_mode = self._config["dark_mode"]
+
+        if not dark_mode: # Apply dark theme
+            file = QtCore.QFile(":/dark/stylesheet.qss")
+            file.open(QtCore.QFile.ReadOnly | QtCore.QFile.Text)
+            stream = QtCore.QTextStream(file)
+            self.setStyleSheet(stream.readAll())
+            self._config["dark_mode"] = not self._config["dark_mode"]
+        else:
+            self.setStyleSheet("")  # Clear any custom stylesheet
+            self._config["dark_mode"] = not self._config["dark_mode"]
+
