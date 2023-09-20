@@ -927,7 +927,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actions.createLineStripMode.setEnabled(True)
         self.actions.createAiPolygonMode.setEnabled(True)
         title = __appname__
-        if self.filename is not None:
+        if self.filename is not None and self.imageList is not None:
+            currIndex = self.imageList.index(self.filename) + 1
+            imageCount = len(self.imageList)
+            title = f"{title} - {self.filename} [{currIndex}/{imageCount}]"
+
+        elif self.filename is not None:
             title = "{} - {}".format(title, self.filename)
         self.setWindowTitle(title)
 
