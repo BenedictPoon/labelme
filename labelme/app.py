@@ -34,6 +34,7 @@ from labelme.widgets import LabelListWidgetItem
 from labelme.widgets import ToolBar
 from labelme.widgets import UniqueLabelQListWidget
 from labelme.widgets import ZoomWidget
+from labelme.widgets import breeze_resources
 
 # FIXME
 # - [medium] Set max zoom value to something big enough for FitWidth/Window
@@ -320,6 +321,18 @@ class MainWindow(QtWidgets.QMainWindow):
         )
         toggle_keep_prev_mode.setChecked(self._config["keep_prev"])
 
+        # Create dark mode checkbox
+        toggleDarkMode = action(
+            self.tr("Dark Mode"),
+            self.toggleDarkMode,
+            None,
+            checkable=True,
+        )
+        toggleDarkMode.setChecked(self._config["dark_mode"])
+        if toggleDarkMode.isChecked():
+            self._config["dark_mode"] = not self._config["dark_mode"]
+            self.toggleDarkMode()
+
         createMode = action(
             self.tr("Create Polygons"),
             lambda: self.toggleDrawMode(False, createMode="polygon"),
@@ -605,6 +618,7 @@ class MainWindow(QtWidgets.QMainWindow):
             close=close,
             deleteFile=deleteFile,
             toggleKeepPrevMode=toggle_keep_prev_mode,
+            toggleDarkMode=toggleDarkMode,
             delete=delete,
             edit=edit,
             duplicate=duplicate,
@@ -734,6 +748,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 fitWidth,
                 None,
                 brightnessContrast,
+                toggleDarkMode,
+
             ),
         )
 
@@ -927,7 +943,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.actions.createLineStripMode.setEnabled(True)
         self.actions.createAiPolygonMode.setEnabled(True)
         title = __appname__
-        if self.filename is not None:
+        if self.filename is not None and self.imageList is not None:
+            currIndex = self.imageList.index(self.filename) + 1
+            imageCount = len(self.imageList)
+            title = f"{title} - {self.filename} [{currIndex}/{imageCount}]" #add in index tracker on the title
+
+        elif self.filename is not None:
             title = "{} - {}".format(title, self.filename)
         self.setWindowTitle(title)
 
@@ -2149,3 +2170,18 @@ class MainWindow(QtWidgets.QMainWindow):
                     images.append(relativePath)
         images = natsort.os_sorted(images)
         return images
+
+    # Toggle dark mode function
+    def toggleDarkMode(self):
+        dark_mode = self._config["dark_mode"]
+
+        if not dark_mode: # Apply dark theme
+            file = QtCore.QFile(":/dark/stylesheet.qss") #Select the stylesheet option
+            file.open(QtCore.QFile.ReadOnly | QtCore.QFile.Text) #Open the stylesheet 
+            stream = QtCore.QTextStream(file) 
+            self.setStyleSheet(stream.readAll()) #Set the stylesheet
+            self._config["dark_mode"] = not self._config["dark_mode"] #Toggle the variable
+        else:
+            self.setStyleSheet("")  # Clear any custom stylesheet
+            self._config["dark_mode"] = not self._config["dark_mode"]
+
