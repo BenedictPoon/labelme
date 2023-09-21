@@ -2176,11 +2176,11 @@ class MainWindow(QtWidgets.QMainWindow):
         dark_mode = self._config["dark_mode"]
 
         if not dark_mode: # Apply dark theme
-            file = QtCore.QFile(":/dark/stylesheet.qss")
-            file.open(QtCore.QFile.ReadOnly | QtCore.QFile.Text)
-            stream = QtCore.QTextStream(file)
-            self.setStyleSheet(stream.readAll())
-            self._config["dark_mode"] = not self._config["dark_mode"]
+            file = QtCore.QFile(":/dark/stylesheet.qss") #Select the stylesheet option
+            file.open(QtCore.QFile.ReadOnly | QtCore.QFile.Text) #Open the stylesheet 
+            stream = QtCore.QTextStream(file) 
+            self.setStyleSheet(stream.readAll()) #Set the stylesheet
+            self._config["dark_mode"] = not self._config["dark_mode"] #Toggle the variable
         else:
             self.setStyleSheet("")  # Clear any custom stylesheet
             self._config["dark_mode"] = not self._config["dark_mode"]
