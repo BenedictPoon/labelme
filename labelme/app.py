@@ -319,10 +319,9 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tr('Toggle "keep pevious annotation" mode'),
             checkable=True,
         )
-        self._config["keep_prev"] = self._config["keep_prev"]
-        print(self._config["keep_prev"])
         toggle_keep_prev_mode.setChecked(self._config["keep_prev"])
 
+        # Create dark mode checkbox
         toggleDarkMode = action(
             self.tr("Dark Mode"),
             self.toggleDarkMode,
@@ -947,7 +946,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.filename is not None and self.imageList is not None:
             currIndex = self.imageList.index(self.filename) + 1
             imageCount = len(self.imageList)
-            title = f"{title} - {self.filename} [{currIndex}/{imageCount}]"
+            title = f"{title} - {self.filename} [{currIndex}/{imageCount}]" #add in index tracker on the title
 
         elif self.filename is not None:
             title = "{} - {}".format(title, self.filename)
@@ -2172,6 +2171,7 @@ class MainWindow(QtWidgets.QMainWindow):
         images = natsort.os_sorted(images)
         return images
 
+    # Toggle dark mode function
     def toggleDarkMode(self):
         dark_mode = self._config["dark_mode"]
 
